@@ -1,50 +1,91 @@
-class Usuario {
-    constructor(nombre, apellido){
-        this.nombre = nombre;
-        this.apellido = apellido;
-        this.mascotas = []; 
-        this.libros = []; 
+const fs = require('fs');
+
+class Contenedor {
+
+    constructor(ruta){
+        this.ruta = ruta;
     }
-    getFullName = () => {
-        console.log(`El usuario es: ${this.nombre} ${this.apellido}`);
+
+    async save(object){
+        const listado = await this.getAll()
+
+        let nuevoId
+
+        if(listado.length == 0){
+            nuevoId = 1
+        }else{
+            nuevoId = listado[listado.length - 1].id + 1
+        }
+
+        const nuevoObjetoConId = {...object, id: nuevoId}
+
+        listado.push(nuevoObjetoConId)
+
+        try {
+            await fs.promises.writeFile(this.ruta, JSON.stringify(listado, null, 2))
+            return nuevoId
+        } catch (error) {
+            throw new Error(`hubo un error al guardar un nuevo objeto ${error}`)
+        }
     }
-    addMascota = (mascota) => {
-        this.mascotas.push(mascota);
-        console.log(`se agrego la mascota ${mascota}`)
+
+    async getAll(){
+        try {
+            const data = await fs.promises.readFile(this.ruta, 'utf-8')
+            return JSON.parse(data)
+        } catch (error) {
+            return []
+        }
     }
-    countMascota = () => {
-        let cantidadDeMascotas = this.mascotas.length
-        console.log(`${this.nombre} tiene ${cantidadDeMascotas} mascota`);
+
+    async getById(id) {
+        try {
+            const listado = await this.getAll()
+            return listado.find(item => item.id === id)
+        } catch (error) {
+            
+        }
     }
-    addBook = (nombreLibro, autor) => {
-        this.libros.push(new libro(nombreLibro, autor))
+
+    async deleteAll(){
+        try {
+            await fs.promises.writeFile(this.ruta, JSON.stringify([], null, 2))
+        } catch (error) {
+        
+        }
     }
-    getBookNames = () => {
-        let array = this.libros.map(function(element){
-        return element.nombreLibro;
-        });
-        console.log(array)
+
+    async deleteById(id) {
+        const listado = await this.getAll()
+        const nuevoListado = listado.filter(item => item.id != id)
+        try {
+            await fs.promises.writeFile(this.ruta, JSON.stringify(nuevoListado, null, 2))
+        } catch (error) {
+        
+        }
     }
+
 }
-
-class libro {
-    constructor(nombreLibro, autor){
-        this.nombreLibro = nombreLibro;
-        this.autor = autor;
-    }
-};
-
-let pablo = new Usuario("pablo", "cristini");
-pablo.getFullName()
-pablo.addMascota("perro")
-pablo.countMascota()
-pablo.addBook("Harry Potter", "fedklen")
-pablo.addBook("Shrek", "fedklen")
-pablo.getBookNames()
+module.exports = Contenedor;
 
 
 
 
+
+
+
+
+
+getAll = () => {
+    fs.readdir('./productos.txt', (error, productos) => {
+        if(error) {
+            console.log("no hay productos")
+        }
+        else {
+            console.log(productos)
+        }
+    })
+}
 
 
 
