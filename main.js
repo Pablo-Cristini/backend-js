@@ -9,6 +9,10 @@ class Contenedor {
     async save(object){
         const listado = await this.getAll()
 
+        if(listado.length > 0 && listado.some((el) => el.title === object.title)){
+            console.log("El producto ya existe")
+        }
+
         let nuevoId
 
         if(listado.length == 0){

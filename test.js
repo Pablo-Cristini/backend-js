@@ -18,10 +18,20 @@ async function main() {
 
     let datos = await contenedor.getAll()
     console.log(datos)
+
     let id1 = await contenedor.save(item1) 
     console.log(id1)
-    
+
+    let busqueda = await contenedor.getById(1)
+    console.log(busqueda)
+
+    await contenedor.deleteById(1)
+    let borrar = await contenedor.getAll()
+    console.log(borrar)
+
+    await contenedor.deleteAll()
+    let borrarTodo = await contenedor.getAll()
+    console.log(borrarTodo)
 }
 
 main()
-
